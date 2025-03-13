@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
 
-interface InputProps extends ComponentProps<"input"> {
+interface InputProps extends ComponentProps<'input'> {
   name: string;
 }
 

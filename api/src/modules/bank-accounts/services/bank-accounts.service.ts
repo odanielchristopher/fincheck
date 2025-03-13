@@ -59,7 +59,7 @@ export class BankAccountsService {
     );
 
     await this.bankAccountRepo.delete({
-      where: { userId, id: bankAccountId },
+      where: { id: bankAccountId },
     });
 
     return null;

@@ -12,6 +12,7 @@ export function useAccountsController() {
   });
 
   return {
+    isLoading: false,
     sliderState,
     windowWidth,
     areValuesVisible,

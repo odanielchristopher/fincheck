@@ -4,7 +4,7 @@ import { Input } from '../../components/Input';
 import { useLoginController } from './useLoginController';
 
 export function Login() {
-  const { register, handleSubmit } = useLoginController();
+  const { errors, register, handleSubmit } = useLoginController();
 
   return (
     <>
@@ -30,11 +30,16 @@ export function Login() {
         <Input
           type="email"
           placeholder="E-mail"
-          error="Informe o e-mail"
+          error={errors.email?.message}
           {...register('email')}
         />
 
-        <Input type="password" placeholder="Senha" {...register('password')} />
+        <Input
+          type="password"
+          placeholder="Senha"
+          error={errors.password?.message}
+          {...register('password')}
+        />
 
         <Button type="submit" className="mt-2">
           Entrar

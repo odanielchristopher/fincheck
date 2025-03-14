@@ -17,7 +17,7 @@ export function LaunchScreen({ isLoading }: LaunchScreenProps) {
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="bg-teal-900 w-full h-full fixed top-0 left-0 flex flex-col items-center justify-center gap-6">
+      <div className="bg-teal-900 w-full z-50 h-full fixed top-0 left-0 flex flex-col items-center justify-center gap-6">
         <Logo className="h-8 text-white" />
 
         <Spinner className="text-teal-900 fill-white" />

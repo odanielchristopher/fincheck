@@ -12,7 +12,7 @@ export function Dashboard() {
         <UserMenu />
       </header>
 
-      <main className="flex-1 flex flex-col gap-4 lg:flex-row">
+      <main className="flex-1 flex flex-col gap-4 lg:flex-row max-h-full">
         <div className="w-full lg:w-1/2">
           <Accounts />
         </div>

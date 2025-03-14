@@ -1,11 +1,11 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import { AuthGuard } from "./AuthGuard";
+import { AuthGuard } from './AuthGuard';
 
-import { AuthLayout } from "../../views/layouts/AuthLayout";
-import { Dashboard } from "../../views/pages/Dashboard";
-import { Login } from "../../views/pages/Login";
-import { Register } from "../../views/pages/Register";
+import { AuthLayout } from '../../views/layouts/AuthLayout';
+import { Dashboard } from '../../views/pages/Dashboard';
+import { Login } from '../../views/pages/Login';
+import { Register } from '../../views/pages/Register';
 
 export function Router() {
   return (

@@ -1,13 +1,10 @@
-import { Link } from "react-router-dom";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { useLoginController } from "./useLoginController";
+import { Link } from 'react-router-dom';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import { useLoginController } from './useLoginController';
 
 export function Login() {
-  const {
-    register,
-    handleSubmit,
-  } = useLoginController();
+  const { register, handleSubmit } = useLoginController();
 
   return (
     <>
@@ -33,14 +30,11 @@ export function Login() {
         <Input
           type="email"
           placeholder="E-mail"
-          {...register("email")}
+          error="Informe o e-mail"
+          {...register('email')}
         />
 
-        <Input
-          type="password"
-          placeholder="Senha"
-          {...register("password")}
-        />
+        <Input type="password" placeholder="Senha" {...register('password')} />
 
         <Button type="submit" className="mt-2">
           Entrar

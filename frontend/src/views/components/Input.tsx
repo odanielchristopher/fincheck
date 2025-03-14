@@ -1,14 +1,20 @@
 import { CrossCircledIcon } from '@radix-ui/react-icons';
-import { clsx } from 'clsx';
 import { ComponentProps } from 'react';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '../../app/utils/cn';
 
 interface InputProps extends ComponentProps<'input'> {
   name: string;
   error?: string;
 }
 
-export function Input({ id, name, placeholder, error, ...props }: InputProps) {
+export function Input({
+  id,
+  name,
+  placeholder,
+  error,
+  className,
+  ...props
+}: InputProps) {
   const inputId = id ?? name;
 
   return (
@@ -17,10 +23,10 @@ export function Input({ id, name, placeholder, error, ...props }: InputProps) {
         {...props}
         id={inputId}
         name={name}
-        className={twMerge(
-          clsx(
-            'bg-white w-full rounded-lg border border-gray-500 px-3 h-[52px] text-gray-800 outline-none pt-4 peer placeholder-shown:pt-0 focus:border-gray-800 transition-all',
-          ),
+        className={cn(
+          'bg-white w-full rounded-lg border border-gray-500 px-3 h-[52px] text-gray-800 outline-none pt-4 peer placeholder-shown:pt-0 focus:border-gray-800 transition-all',
+          error && '!border-red-900',
+          className,
         )}
         placeholder=" "
       />

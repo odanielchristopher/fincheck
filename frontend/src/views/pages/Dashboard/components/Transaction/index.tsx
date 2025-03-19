@@ -1,20 +1,32 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { MONTHS } from '../../../../../app/config/constants';
-import { cn } from '../../../../../app/utils/cn';
-import { formatCurrency } from '../../../../../app/utils/formatCurrency';
 import { CategoryIcon } from '../../../../assets/icons/categories/CategoryIcon';
 import { FilterIcon } from '../../../../assets/icons/FilterIcon';
 import emptyStateImage from '../../../../assets/images/empty-state.svg';
+
+import { MONTHS } from '../../../../../app/config/constants';
+import { cn } from '../../../../../app/utils/cn';
+import { formatCurrency } from '../../../../../app/utils/formatCurrency';
+
 import { Spinner } from '../../../../components/Spinner';
+
+import { FiltersModal } from './FiltersModal';
 import { SliderNavigation } from './SliderNavigation';
 import { SliderOption } from './SliderOption';
 import { TransactionTypeDropdown } from './TransactionTypeDropdown';
+
 import { useTransactionsController } from './useTransactionsController';
 
 export function Transactions() {
-  const { areValuesVisible, isInitialLoading, isLoading, transactions } =
-    useTransactionsController();
+  const {
+    isLoading,
+    transactions,
+    areValuesVisible,
+    isInitialLoading,
+    isFiltersModalOpen,
+    handleCloseFiltersModal,
+    handleOpenFiltersModal,
+  } = useTransactionsController();
 
   const hasTransactions = transactions.length > 0;
 
@@ -28,11 +40,19 @@ export function Transactions() {
 
       {!isInitialLoading && (
         <>
+          <FiltersModal
+            open={isFiltersModalOpen}
+            onClose={handleCloseFiltersModal}
+          />
+
           <header className="">
             <div className="flex items-center justify-between">
               <TransactionTypeDropdown />
 
-              <button className="p-3 flex items-center justify-center rounded-full">
+              <button
+                onClick={handleOpenFiltersModal}
+                className="p-3 flex items-center justify-center rounded-full"
+              >
                 <FilterIcon />
               </button>
             </div>

@@ -1,13 +1,14 @@
+import { Button } from '../../../../components/Button';
 import { ColorsDropdownInput } from '../../../../components/ColorsDropdownInput';
 import { Input } from '../../../../components/Input';
 import { InputCurrency } from '../../../../components/InputCurrency';
 import { Modal } from '../../../../components/Modal';
 import { Select } from '../../../../components/Select';
-import { useNewBankAccountModal } from './useNewBankAccountModal';
+import { useNewBankAccountModalController } from './useNewBankAccountModalController';
 
 export function NewBankAccountModal() {
   const { isNewBankAccountModalOpen, closeNewBankAccountModal } =
-    useNewBankAccountModal();
+    useNewBankAccountModalController();
 
   return (
     <Modal
@@ -51,6 +52,8 @@ export function NewBankAccountModal() {
 
           <ColorsDropdownInput />
         </div>
+
+        <Button className="w-full mt-6">Criar</Button>
       </form>
     </Modal>
   );

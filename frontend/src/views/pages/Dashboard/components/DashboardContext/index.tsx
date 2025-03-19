@@ -4,11 +4,17 @@ import { localStorageKeys } from '../../../../../app/config/localStorageKeys';
 
 interface DashboardContextValue {
   areValuesVisible: boolean;
+  newTransactionType: TransactionType | null;
   isNewBankAccountModalOpen: boolean;
+  isNewTransactionModalOpen: boolean;
   toogleValuesVisibility(): void;
   openNewBankAccountModal(): void;
   closeNewBankAccountModal(): void;
+  openNewTransactionModal(type: TransactionType): void;
+  closeNewTransactionModal(): void;
 }
+
+type TransactionType = 'INCOME' | 'EXPENSE';
 
 export const DashboardContext = createContext({} as DashboardContextValue);
 
@@ -21,7 +27,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     return storageAreValuesVisible === 'false' ? false : true;
   });
   const [isNewBankAccountModalOpen, setIsNewBankAccountModalOpen] =
-    useState(true);
+    useState(false);
+  const [isNewTransactionModalOpen, setIsNewTransactionModalOpen] =
+    useState(false);
+  const [newTransactionType, setNewTransactionType] = useState<TransactionType | null>(null);
 
   const toogleValuesVisibility = useCallback(() => {
     setAreValuesVisible((prevState) => {
@@ -44,14 +53,28 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setIsNewBankAccountModalOpen(false);
   }, []);
 
+  const openNewTransactionModal = useCallback((type: TransactionType) => {
+    setIsNewTransactionModalOpen(true);
+    setNewTransactionType(type);
+  }, []);
+
+  const closeNewTransactionModal = useCallback(() => {
+    setNewTransactionType(null);
+    setIsNewTransactionModalOpen(false);
+  }, []);
+
   return (
     <DashboardContext.Provider
       value={{
         areValuesVisible,
+        newTransactionType,
+        isNewTransactionModalOpen,
         isNewBankAccountModalOpen,
         toogleValuesVisibility,
         openNewBankAccountModal,
         closeNewBankAccountModal,
+        openNewTransactionModal,
+        closeNewTransactionModal,
       }}
     >
       {children}

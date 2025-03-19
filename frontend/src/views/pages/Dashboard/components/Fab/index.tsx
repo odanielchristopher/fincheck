@@ -5,7 +5,7 @@ import { DropdownMenu } from '../../../../components/DropdownMenu';
 import { useDashboard } from '../DashboardContext/useDashboard';
 
 export function Fab() {
-  const { openNewBankAccountModal } = useDashboard();
+  const { openNewBankAccountModal, openNewTransactionModal } = useDashboard();
 
   return (
     <DropdownMenu.Root>
@@ -16,14 +16,20 @@ export function Fab() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content side="top" align="end">
-        <DropdownMenu.Item className="gap-2 justify-start">
+        <DropdownMenu.Item
+          className="gap-2 justify-start"
+          onSelect={() => openNewTransactionModal('INCOME')}
+        >
           <CategoryIcon type="income" />
-          Nova receitas
+          Nova Receita
         </DropdownMenu.Item>
 
-        <DropdownMenu.Item className="gap-2 justify-start">
+        <DropdownMenu.Item
+          className="gap-2 justify-start"
+          onSelect={() => openNewTransactionModal('EXPENSE')}
+        >
           <CategoryIcon type="expense" />
-          Nova despesas
+          Nova Despesa
         </DropdownMenu.Item>
 
         <DropdownMenu.Item

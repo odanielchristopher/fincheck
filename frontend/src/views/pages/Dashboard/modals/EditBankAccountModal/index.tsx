@@ -5,9 +5,9 @@ import { Input } from '../../../../components/Input';
 import { InputCurrency } from '../../../../components/InputCurrency';
 import { Modal } from '../../../../components/Modal';
 import { Select } from '../../../../components/Select';
-import { useNewBankAccountModalController } from './useNewBankAccountModalController';
+import { useEditBankAccountModalController } from './useEditBankAccountModalController';
 
-export function NewBankAccountModal() {
+export function EditBankAccountModal() {
   const {
     errors,
     control,
@@ -16,7 +16,7 @@ export function NewBankAccountModal() {
     register,
     handleSubmit,
     closeNewBankAccountModal,
-  } = useNewBankAccountModalController();
+  } = useEditBankAccountModalController();
 
   return (
     <Modal

@@ -18,7 +18,7 @@ const bankAccountSchema = z.object({
 
 type BankAccountFormData = z.infer<typeof bankAccountSchema>;
 
-export function useNewBankAccountModalController() {
+export function useEditBankAccountModalController() {
   const { isNewBankAccountModalOpen, closeNewBankAccountModal } =
     useDashboard();
 

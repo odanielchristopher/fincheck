@@ -1,8 +1,8 @@
-import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 import { cn } from '../../app/utils/cn';
 import { formatDate } from '../../app/utils/formatDate';
 import { DatePicker } from './DatePicker';
+import { FildError } from './FildError';
 import { Popover } from './Popover';
 
 interface DatePickerInputProps {
@@ -50,12 +50,7 @@ export function DatePickerInput({
         </Popover.Content>
       </Popover.Root>
 
-      {error && (
-        <div className="flex gap-2 items-center mt-2 text-red-900">
-          <CrossCircledIcon />
-          <span className="text-xs">{error}</span>
-        </div>
-      )}
+      {error && <FildError message={error} />}
     </div>
   );
 }

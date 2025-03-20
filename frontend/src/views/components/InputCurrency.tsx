@@ -1,6 +1,6 @@
-import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { NumericFormat } from 'react-number-format';
 import { cn } from '../../app/utils/cn';
+import { FildError } from './FildError';
 
 interface InputCurrencyProps {
   error?: string;
@@ -22,12 +22,7 @@ export function InputCurrency({ value, onChange, error }: InputCurrencyProps) {
         )}
       />
 
-      {error && (
-        <div className="flex gap-2 items-center mt-2 text-red-900">
-          <CrossCircledIcon />
-          <span className="text-xs">{error}</span>
-        </div>
-      )}
+      {error && <FildError message={error} />}
     </div>
   );
 }

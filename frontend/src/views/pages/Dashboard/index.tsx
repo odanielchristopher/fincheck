@@ -6,7 +6,7 @@ import {
   DashboardProvider,
 } from './components/DashboardContext';
 import { Fab } from './components/Fab';
-import { Transactions } from './components/Transaction';
+import { Transactions } from './components/Transactions';
 
 import { EditBankAccountModal } from './modals/EditBankAccountModal';
 import { NewBankAccountModal } from './modals/NewBankAccountModal';

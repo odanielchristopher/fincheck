@@ -1,6 +1,8 @@
 import { Controller } from 'react-hook-form';
+import { TrashIcon } from '../../../../assets/icons/TrashIcon';
 import { Button } from '../../../../components/Button';
 import { ColorsDropdownInput } from '../../../../components/ColorsDropdownInput';
+import { ConfirmDeleteModal } from '../../../../components/ConfirmDeleteModal';
 import { Input } from '../../../../components/Input';
 import { InputCurrency } from '../../../../components/InputCurrency';
 import { Modal } from '../../../../components/Modal';
@@ -12,17 +14,44 @@ export function EditBankAccountModal() {
     errors,
     control,
     isLoading,
-    isNewBankAccountModalOpen,
+    isLoadingDelete,
+    isEditBankAccountModalOpen,
+    isDeleteModalVisible,
     register,
     handleSubmit,
-    closeNewBankAccountModal,
+    handleDeleteBankAccount,
+    closeEditBankAccountModal,
+    handleCloseDeleteModal,
+    handleOpenDeleteModal,
   } = useEditBankAccountModalController();
+
+  if (isDeleteModalVisible) {
+    return (
+      <ConfirmDeleteModal
+        open
+        isLoading={isLoadingDelete}
+        onConfirm={handleDeleteBankAccount}
+        title="Tem certeza que deseja excluir esta conta?"
+        description="Ao excluir a conta, também serão excluídos todos os registros de
+          receita e despesa relacionados."
+        onClose={handleCloseDeleteModal}
+      />
+    );
+  }
 
   return (
     <Modal
-      title="Nova conta"
-      open={isNewBankAccountModalOpen}
-      onClose={closeNewBankAccountModal}
+      title="Editar conta"
+      open={isEditBankAccountModalOpen}
+      onClose={closeEditBankAccountModal}
+      rightAction={
+        <button
+          onClick={handleOpenDeleteModal}
+          className="w-full h-full rounded-full flex items-center justify-center"
+        >
+          <TrashIcon className="w-6 h-6 text-red-900" />
+        </button>
+      }
     >
       <form onSubmit={handleSubmit}>
         <div>
@@ -34,7 +63,7 @@ export function EditBankAccountModal() {
             <Controller
               control={control}
               name="initialBalance"
-              defaultValue="0"
+              defaultValue={0}
               render={({ field: { onChange, value } }) => (
                 <InputCurrency
                   value={value}

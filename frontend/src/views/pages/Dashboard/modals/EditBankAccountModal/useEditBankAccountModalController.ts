@@ -3,14 +3,18 @@ import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { bankAccountsService } from '../../../../../app/services/bankAccountsService';
-import { CreateBankAccountParams } from '../../../../../app/services/bankAccountsService/create';
+import { UpdateBankAccountParams } from '../../../../../app/services/bankAccountsService/update';
 import { currencyStringToNumber } from '../../../../../app/utils/currencyStringToNumber';
 import { useDashboard } from '../../components/DashboardContext/useDashboard';
 
 const bankAccountSchema = z.object({
-  initialBalance: z.string().nonempty('Saldo inicial é obrigatório.'),
+  initialBalance: z.union([
+    z.string().nonempty('Saldo inicial é obrigatório.'),
+    z.number(),
+  ]),
   name: z.string().nonempty('Nome da conta é obrigatório.'),
   type: z.enum(['INVESTMENT', 'CHECKING', 'CASH']),
   color: z.string().nonempty('Cor é obrigatória.'),
@@ -19,8 +23,11 @@ const bankAccountSchema = z.object({
 type BankAccountFormData = z.infer<typeof bankAccountSchema>;
 
 export function useEditBankAccountModalController() {
-  const { isNewBankAccountModalOpen, closeNewBankAccountModal } =
-    useDashboard();
+  const {
+    accountBeingEdited,
+    isEditBankAccountModalOpen,
+    closeEditBankAccountModal,
+  } = useDashboard();
 
   const {
     handleSubmit: hookFormHandleSubmit,
@@ -30,13 +37,21 @@ export function useEditBankAccountModalController() {
     reset,
   } = useForm<BankAccountFormData>({
     resolver: zodResolver(bankAccountSchema),
+    defaultValues: {
+      initialBalance: accountBeingEdited?.initialBalance,
+      name: accountBeingEdited?.name,
+      color: accountBeingEdited?.color,
+      type: accountBeingEdited?.type,
+    },
   });
+
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: createBankAccount, isPending: isLoading } = useMutation({
-    mutationFn: (data: CreateBankAccountParams) =>
-      bankAccountsService.create(data),
+  const { mutateAsync: updateBankAccount, isPending: isLoading } = useMutation({
+    mutationFn: (data: UpdateBankAccountParams) =>
+      bankAccountsService.update(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['bankAccounts'],
@@ -44,28 +59,65 @@ export function useEditBankAccountModalController() {
     },
   });
 
+  const { mutateAsync: removeBankAccount, isPending: isLoadingDelete } =
+    useMutation({
+      mutationFn: (bankAccountId: string) =>
+        bankAccountsService.remove(bankAccountId),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['bankAccounts'],
+        });
+      },
+    });
+
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     try {
-      createBankAccount({
+      await updateBankAccount({
         ...data,
         initialBalance: currencyStringToNumber(data.initialBalance),
+        id: accountBeingEdited!.id,
       });
 
       reset();
-      closeNewBankAccountModal();
-      toast.success('Conta foi criada com sucesso!');
+      closeEditBankAccountModal();
+      toast.success('A conta foi editada com sucesso!');
     } catch {
-      toast.error('Erro ao cadastrar a conta!');
+      toast.error('Erro ao salvar a conta!');
     }
   });
+
+  function handleOpenDeleteModal() {
+    setIsDeleteModalVisible(true);
+  }
+
+  function handleCloseDeleteModal() {
+    setIsDeleteModalVisible(false);
+  }
+
+  async function handleDeleteBankAccount() {
+    try {
+      await removeBankAccount(accountBeingEdited!.id);
+
+      reset();
+      closeEditBankAccountModal();
+      toast.success('A conta foi removida com sucesso!');
+    } catch {
+      toast.error('Erro ao remover a conta!');
+    }
+  }
 
   return {
     errors,
     control,
     isLoading,
-    isNewBankAccountModalOpen,
+    isLoadingDelete,
+    isDeleteModalVisible,
+    isEditBankAccountModalOpen,
     register,
     handleSubmit,
-    closeNewBankAccountModal,
+    handleDeleteBankAccount,
+    closeEditBankAccountModal,
+    handleOpenDeleteModal,
+    handleCloseDeleteModal,
   };
 }

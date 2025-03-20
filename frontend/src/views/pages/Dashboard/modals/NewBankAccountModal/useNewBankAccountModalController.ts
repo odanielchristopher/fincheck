@@ -46,7 +46,7 @@ export function useNewBankAccountModalController() {
 
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     try {
-      createBankAccount({
+      await createBankAccount({
         ...data,
         initialBalance: currencyStringToNumber(data.initialBalance),
       });

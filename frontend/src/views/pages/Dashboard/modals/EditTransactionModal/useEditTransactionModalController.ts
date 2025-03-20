@@ -1,26 +1,19 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+
 import { Transaction } from '../../../../../app/entities/Transaction';
+
 import { useBankAccounts } from '../../../../../app/hooks/useBankAccounts';
 import { useCategories } from '../../../../../app/hooks/useCategories';
+
 import { transactionsService } from '../../../../../app/services/transactionsService';
 import { UpdateTransactionParams } from '../../../../../app/services/transactionsService/update';
 import { currencyStringToNumber } from '../../../../../app/utils/currencyStringToNumber';
 
-const transactionSchema = z.object({
-  value: z.union([z.string().nonempty('Valor é obrigatório.'), z.number()]),
-  name: z.string().nonempty('Nome é obrigatório.'),
-  categoryId: z.string().nonempty('Categoria é obrigatória.'),
-  bankAccountId: z.string().nonempty('Conta é obrigatória.'),
-  date: z.date(),
-});
+import { TransactionFormData } from '../../components/TransactionForm/useTransactionFormController';
 
-type TransactionFormData = z.infer<typeof transactionSchema>;
 
 export function useEditTransactionModalController(
   transactionBeingEdited: Transaction,
@@ -36,22 +29,6 @@ export function useEditTransactionModalController(
       (category) => transactionBeingEdited.type === category.type,
     );
   }, [categoriesList, transactionBeingEdited]);
-
-  const {
-    handleSubmit: hookFormHandleSubmit,
-    register,
-    formState: { errors },
-    control,
-  } = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      name: transactionBeingEdited.name,
-      value: transactionBeingEdited.value,
-      date: new Date(transactionBeingEdited.date),
-      bankAccountId: transactionBeingEdited.bankAccountId,
-      categoryId: transactionBeingEdited.category?.id,
-    },
-  });
 
   const queryClient = useQueryClient();
 
@@ -73,7 +50,7 @@ export function useEditTransactionModalController(
     },
   });
 
-  const handleSubmit = hookFormHandleSubmit(async (data) => {
+  async function handleSubmit(data: TransactionFormData) {
     try {
       await updateTransaction({
         ...data,
@@ -96,7 +73,7 @@ export function useEditTransactionModalController(
           : 'Erro ao salvar a receita!'
       );
     }
-  });
+  };
 
   function handleOpenDeleteModal() {
     setIsDeleteModalOpen(true);
@@ -127,14 +104,11 @@ export function useEditTransactionModalController(
   }
 
   return {
-    errors,
     accounts,
     isLoading,
     categories,
-    control,
     isDeleteModalOpen,
     isLoadingDelete,
-    register,
     handleSubmit,
     handleOpenDeleteModal,
     handleCloseDeleteModal,

@@ -1,7 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { z } from 'zod';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -11,16 +8,8 @@ import { transactionsService } from '../../../../../app/services/transactionsSer
 import { CreateTransactionParams } from '../../../../../app/services/transactionsService/create';
 import { currencyStringToNumber } from '../../../../../app/utils/currencyStringToNumber';
 import { useDashboard } from '../../components/DashboardContext/useDashboard';
+import { TransactionFormData } from '../../components/TransactionForm/useTransactionFormController';
 
-const transactionSchema = z.object({
-  value: z.string().nonempty('Valor é obrigatório.'),
-  name: z.string().nonempty('Nome é obrigatório.'),
-  categoryId: z.string().nonempty('Categoria é obrigatória.'),
-  bankAccountId: z.string().nonempty('Conta é obrigatória.'),
-  date: z.date(),
-});
-
-type TransactionFormData = z.infer<typeof transactionSchema>;
 
 export function useNewTransactionModalController() {
   const {
@@ -38,15 +27,6 @@ export function useNewTransactionModalController() {
     );
   }, [categoriesList, newTransactionType]);
 
-  const {
-    handleSubmit: hookFormHandleSubmit,
-    register,
-    formState: { errors },
-    control,
-    reset,
-  } = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
-  });
 
   const queryClient = useQueryClient();
 
@@ -59,7 +39,7 @@ export function useNewTransactionModalController() {
     }
   });
 
-  const handleSubmit = hookFormHandleSubmit(async (data) => {
+  async function handleSubmit(data: TransactionFormData) {
     try {
       await createTransaction({
         ...data,
@@ -68,7 +48,6 @@ export function useNewTransactionModalController() {
         type: newTransactionType!,
       });
 
-      reset();
       toast.success(
         newTransactionType === 'EXPENSE'
         ? 'Despesa cadastrada com sucesso!'
@@ -82,17 +61,14 @@ export function useNewTransactionModalController() {
           : 'Erro ao cadastrar receita!'
       );
     }
-  });
+  }
 
   return {
-    errors,
     accounts,
     isLoading,
     categories,
-    control,
     newTransactionType,
     isNewTransactionModalOpen,
-    register,
     handleSubmit,
     closeNewTransactionModal,
   };

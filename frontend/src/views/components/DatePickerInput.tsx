@@ -6,12 +6,24 @@ import { DatePicker } from './DatePicker';
 import { Popover } from './Popover';
 
 interface DatePickerInputProps {
+  value?: Date;
+  onChange?(value: Date): void;
   className?: string;
   error?: string;
 }
 
-export function DatePickerInput({ className, error }: DatePickerInputProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+export function DatePickerInput({
+  value,
+  className,
+  error,
+  onChange,
+}: DatePickerInputProps) {
+  const [selectedDate, setSelectedDate] = useState(value ?? new Date());
+
+  function handleChangeDate(date: Date) {
+    setSelectedDate(date);
+    onChange?.(date);
+  }
 
   return (
     <div>
@@ -34,7 +46,7 @@ export function DatePickerInput({ className, error }: DatePickerInputProps) {
         </Popover.Trigger>
 
         <Popover.Content>
-          <DatePicker value={selectedDate} onChange={(value) => setSelectedDate(value)}/>
+          <DatePicker value={selectedDate} onChange={handleChangeDate} />
         </Popover.Content>
       </Popover.Root>
 

@@ -15,7 +15,7 @@ import {
 
 interface TransactionFormProps {
   isLoading: boolean;
-  transactionBeingEdited?: Transaction;
+  transaction?: Transaction;
   transactionType: Transaction['type'];
   buttonLabel: string;
   onSubmit(data: TransactionFormData): Promise<void>;
@@ -23,14 +23,14 @@ interface TransactionFormProps {
 
 export function TransactionForm({
   isLoading,
-  transactionBeingEdited,
+  transaction,
   transactionType,
   buttonLabel,
   onSubmit,
 }: TransactionFormProps) {
   const { accounts, categories, control, errors, register, handleSubmit } =
     useTransactionFormController({
-      transactionBeingEdited,
+      transaction,
       transactionType,
       onSubmit,
     });

@@ -1,26 +1,12 @@
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+
 import { bankAccountsService } from '../../../../../app/services/bankAccountsService';
 import { UpdateBankAccountParams } from '../../../../../app/services/bankAccountsService/update';
 import { currencyStringToNumber } from '../../../../../app/utils/currencyStringToNumber';
+import { BankAccountFormData } from '../../components/BankAccountForm/useBankAccountFormController';
 import { useDashboard } from '../../components/DashboardContext/useDashboard';
-
-const bankAccountSchema = z.object({
-  initialBalance: z.union([
-    z.string().nonempty('Saldo inicial é obrigatório.'),
-    z.number(),
-  ]),
-  name: z.string().nonempty('Nome da conta é obrigatório.'),
-  type: z.enum(['INVESTMENT', 'CHECKING', 'CASH']),
-  color: z.string().nonempty('Cor é obrigatória.'),
-});
-
-type BankAccountFormData = z.infer<typeof bankAccountSchema>;
 
 export function useEditBankAccountModalController() {
   const {
@@ -28,22 +14,6 @@ export function useEditBankAccountModalController() {
     isEditBankAccountModalOpen,
     closeEditBankAccountModal,
   } = useDashboard();
-
-  const {
-    handleSubmit: hookFormHandleSubmit,
-    register,
-    formState: { errors },
-    control,
-    reset,
-  } = useForm<BankAccountFormData>({
-    resolver: zodResolver(bankAccountSchema),
-    defaultValues: {
-      initialBalance: accountBeingEdited?.initialBalance,
-      name: accountBeingEdited?.name,
-      color: accountBeingEdited?.color,
-      type: accountBeingEdited?.type,
-    },
-  });
 
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
@@ -70,7 +40,7 @@ export function useEditBankAccountModalController() {
       },
     });
 
-  const handleSubmit = hookFormHandleSubmit(async (data) => {
+  async function handleSubmit(data: BankAccountFormData) {
     try {
       await updateBankAccount({
         ...data,
@@ -78,13 +48,12 @@ export function useEditBankAccountModalController() {
         id: accountBeingEdited!.id,
       });
 
-      reset();
       closeEditBankAccountModal();
       toast.success('A conta foi editada com sucesso!');
     } catch {
       toast.error('Erro ao salvar a conta!');
     }
-  });
+  }
 
   function handleOpenDeleteModal() {
     setIsDeleteModalVisible(true);
@@ -98,7 +67,6 @@ export function useEditBankAccountModalController() {
     try {
       await removeBankAccount(accountBeingEdited!.id);
 
-      reset();
       handleCloseDeleteModal();
       closeEditBankAccountModal();
       toast.success('A conta foi removida com sucesso!');
@@ -108,13 +76,11 @@ export function useEditBankAccountModalController() {
   }
 
   return {
-    errors,
-    control,
     isLoading,
     isLoadingDelete,
     isDeleteModalVisible,
     isEditBankAccountModalOpen,
-    register,
+    accountBeingEdited,
     handleSubmit,
     handleDeleteBankAccount,
     closeEditBankAccountModal,

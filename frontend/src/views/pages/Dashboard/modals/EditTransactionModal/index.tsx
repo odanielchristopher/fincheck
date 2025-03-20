@@ -62,7 +62,7 @@ export function EditTransactionModal({
         isLoading={isLoading}
         onSubmit={handleSubmit}
         transactionType={transaction.type}
-        transactionBeingEdited={transaction}
+        transaction={transaction}
         buttonLabel="Salvar"
       />
     </Modal>

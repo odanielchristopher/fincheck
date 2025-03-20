@@ -18,13 +18,13 @@ const transactionSchema = z.object({
 export type TransactionFormData = z.infer<typeof transactionSchema>;
 
 interface UseTransactionFormControllerProps {
-  transactionBeingEdited?: Transaction;
+  transaction?: Transaction;
   transactionType: Transaction['type'];
   onSubmit(data: TransactionFormData): Promise<void>;
 }
 
 export function useTransactionFormController({
-  transactionBeingEdited,
+  transaction,
   transactionType,
   onSubmit,
 }: UseTransactionFormControllerProps) {
@@ -45,13 +45,13 @@ export function useTransactionFormController({
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      name: transactionBeingEdited?.name,
-      value: transactionBeingEdited?.value,
-      date: transactionBeingEdited
-        ? new Date(transactionBeingEdited.date)
+      name: transaction?.name,
+      value: transaction?.value,
+      date: transaction
+        ? new Date(transaction.date)
         : new Date(),
-      bankAccountId: transactionBeingEdited?.bankAccountId,
-      categoryId: transactionBeingEdited?.category?.id,
+      bankAccountId: transaction?.bankAccountId,
+      categoryId: transaction?.category?.id,
     },
   });
 

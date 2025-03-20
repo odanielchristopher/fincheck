@@ -55,6 +55,7 @@ export function useNewTransactionModalController() {
       transactionsService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['bankAccounts'] });
     }
   });
 

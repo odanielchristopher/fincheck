@@ -99,6 +99,7 @@ export function useEditBankAccountModalController() {
       await removeBankAccount(accountBeingEdited!.id);
 
       reset();
+      handleCloseDeleteModal();
       closeEditBankAccountModal();
       toast.success('A conta foi removida com sucesso!');
     } catch {

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Transaction } from '../../../../../app/entities/Transaction';
 import { useBankAccounts } from '../../../../../app/hooks/useBankAccounts';
@@ -26,6 +26,8 @@ export function useEditTransactionModalController(
   transactionBeingEdited: Transaction,
   onClose: () => void,
 ) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const { accounts } = useBankAccounts();
   const { categories: categoriesList } = useCategories();
 
@@ -62,6 +64,15 @@ export function useEditTransactionModalController(
     },
   });
 
+  const { mutateAsync: removeTransaction, isPending: isLoadingDelete } = useMutation({
+    mutationFn: (transactionId: string) =>
+      transactionsService.remove(transactionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['bankAccounts'] });
+    },
+  });
+
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     try {
       await updateTransaction({
@@ -87,13 +98,46 @@ export function useEditTransactionModalController(
     }
   });
 
+  function handleOpenDeleteModal() {
+    setIsDeleteModalOpen(true);
+  }
+
+  function handleCloseDeleteModal() {
+    setIsDeleteModalOpen(false);
+  }
+
+  async function handleDeleteTransaction() {
+    try {
+      await removeTransaction(transactionBeingEdited.id);
+
+      handleCloseDeleteModal();
+      onClose();
+      toast.success(
+        transactionBeingEdited.type === 'EXPENSE'
+          ? 'Despesa removida com sucesso!'
+          : 'Receita removida com sucesso!'
+      );
+    } catch {
+      toast.error(
+        transactionBeingEdited.type === 'EXPENSE'
+          ? 'Erro ao remover a despesa!'
+          : 'Erro ao remover a receita!'
+      );
+    }
+  }
+
   return {
     errors,
     accounts,
     isLoading,
     categories,
     control,
+    isDeleteModalOpen,
+    isLoadingDelete,
     register,
     handleSubmit,
+    handleOpenDeleteModal,
+    handleCloseDeleteModal,
+    handleDeleteTransaction,
   };
 }

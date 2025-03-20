@@ -81,12 +81,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setIsNewTransactionModalOpen(false);
   }, []);
 
+
   return (
     <DashboardContext.Provider
       value={{
         areValuesVisible,
-        accountBeingEdited,
         newTransactionType,
+        accountBeingEdited,
         isNewTransactionModalOpen,
         isEditBankAccountModalOpen,
         isNewBankAccountModalOpen,

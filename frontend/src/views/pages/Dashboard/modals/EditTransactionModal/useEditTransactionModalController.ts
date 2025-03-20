@@ -1,19 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
 import { z } from 'zod';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import toast from 'react-hot-toast';
+import { Transaction } from '../../../../../app/entities/Transaction';
 import { useBankAccounts } from '../../../../../app/hooks/useBankAccounts';
 import { useCategories } from '../../../../../app/hooks/useCategories';
 import { transactionsService } from '../../../../../app/services/transactionsService';
-import { CreateTransactionParams } from '../../../../../app/services/transactionsService/create';
+import { UpdateTransactionParams } from '../../../../../app/services/transactionsService/update';
 import { currencyStringToNumber } from '../../../../../app/utils/currencyStringToNumber';
-import { useDashboard } from '../../components/DashboardContext/useDashboard';
 
 const transactionSchema = z.object({
-  value: z.string().nonempty('Valor é obrigatório.'),
+  value: z.union([z.string().nonempty('Valor é obrigatório.'), z.number()]),
   name: z.string().nonempty('Nome é obrigatório.'),
   categoryId: z.string().nonempty('Categoria é obrigatória.'),
   bankAccountId: z.string().nonempty('Conta é obrigatória.'),
@@ -22,63 +22,67 @@ const transactionSchema = z.object({
 
 type TransactionFormData = z.infer<typeof transactionSchema>;
 
-export function useNewTransactionModalController() {
-  const {
-    newTransactionType,
-    isNewTransactionModalOpen,
-    closeNewTransactionModal,
-  } = useDashboard();
-
+export function useEditTransactionModalController(
+  transactionBeingEdited: Transaction,
+  onClose: () => void,
+) {
   const { accounts } = useBankAccounts();
   const { categories: categoriesList } = useCategories();
 
   const categories = useMemo(() => {
     return categoriesList.filter(
-      (category) => newTransactionType === category.type,
+      (category) => transactionBeingEdited.type === category.type,
     );
-  }, [categoriesList, newTransactionType]);
+  }, [categoriesList, transactionBeingEdited]);
 
   const {
     handleSubmit: hookFormHandleSubmit,
     register,
     formState: { errors },
     control,
-    reset,
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      name: transactionBeingEdited.name,
+      value: transactionBeingEdited.value,
+      date: new Date(transactionBeingEdited.date),
+      bankAccountId: transactionBeingEdited.bankAccountId,
+      categoryId: transactionBeingEdited.category?.id,
+    },
   });
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: createTransaction, isPending: isLoading } = useMutation({
-    mutationFn: (data: CreateTransactionParams) =>
-      transactionsService.create(data),
+  const { mutateAsync: updateTransaction, isPending: isLoading } = useMutation({
+    mutationFn: (data: UpdateTransactionParams) =>
+      transactionsService.update(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ['bankAccounts'] });
+    },
   });
 
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     try {
-      await createTransaction({
+      await updateTransaction({
         ...data,
         value: currencyStringToNumber(data.value),
         date: data.date.toISOString(),
-        type: newTransactionType!,
+        type: transactionBeingEdited.type,
+        id: transactionBeingEdited.id,
       });
 
-      reset();
       toast.success(
-        newTransactionType === 'EXPENSE'
-        ? 'Despesa cadastrada com sucesso!'
-        : 'Receita cadastrada com sucesso!'
+        transactionBeingEdited.type === 'EXPENSE'
+          ? 'A despesa foi salva com sucesso!'
+          : 'A receita foi salva com sucesso!'
       );
-      closeNewTransactionModal();
+      onClose();
     } catch {
       toast.error(
-        newTransactionType === 'EXPENSE'
-          ? 'Erro ao cadastrar despesa!'
-          : 'Erro ao cadastrar receita!'
+        transactionBeingEdited.type === 'EXPENSE'
+          ? 'Erro ao salvar a despesa!'
+          : 'Erro ao salvar a receita!'
       );
     }
   });
@@ -89,10 +93,7 @@ export function useNewTransactionModalController() {
     isLoading,
     categories,
     control,
-    newTransactionType,
-    isNewTransactionModalOpen,
     register,
     handleSubmit,
-    closeNewTransactionModal,
   };
 }

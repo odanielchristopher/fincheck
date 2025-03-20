@@ -9,8 +9,8 @@ export interface UpdateBankAccountParams {
   type: BankAccountType;
 }
 
-export async function update(params: UpdateBankAccountParams) {
-  const { data } = await httpClient.put(`/bank-accounts/${params.id}`, params);
+export async function update({ id, ...params }: UpdateBankAccountParams) {
+  const { data } = await httpClient.put(`/bank-accounts/${id}`, params);
 
   return data;
 }
